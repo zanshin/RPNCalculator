@@ -3,7 +3,7 @@
 //  Calculator
 //
 //  Created by Mark Nichols on 4/3/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Mark H. Nichols. All rights reserved.
 //
 
 #import "CalculatorViewController.h"
@@ -14,21 +14,13 @@
 
 @implementation CalculatorViewController
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-}
+@synthesize display = _display;
 
-- (void)viewDidUnload
+- (IBAction)digitPressed:(UIButton *)sender 
 {
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    NSString *digit = [sender currentTitle];
+    self.display.text = [self.display.text stringByAppendingString:digit];
+    
 }
 
 @end
