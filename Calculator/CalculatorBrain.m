@@ -39,23 +39,45 @@
 {
     double result = 0;
     
-    if ([@"+" isEqualToString:operation]) {
-        result = [self popOperand] + [self popOperand];
-    } else if ([@"*" isEqualToString:operation]) {
-        result = [self popOperand] * [self popOperand];
-    } else if ([@"-" isEqualToString:operation]) {
-        double operand1 = [self popOperand];
-        double operand2 = [self popOperand];
-        result = operand2 - operand1;
-    } else if ([@"/" isEqualToString:operation]) {
-        double divisor = [self popOperand];
-        double dividend = [self popOperand];
-        if (divisor == 0) {
-            result = 0;
-        } else {
-            result = dividend / divisor;
+    // sets to hold related operations
+    NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
+    NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
+    
+    double operand1, operand2;
+    
+    // handle single operand operations
+    if ([unaryOperations containsObject:operation]) {
+        operand1 = [self popOperand];
+        if (!operand1) return (result = 0);
+
+        if ([@"sin" isEqualToString:operation]) result = sin(operand1);
+        if ([@"cos" isEqualToString:operation]) result = cos(operand1);
+        if ([@"Sqrt" isEqualToString:operation]) result = sqrt(operand1);
+        if ([@"±" isEqualToString:operation]) result = -operand1;
+
+    }
+
+    // handle double operand operations
+    if ([binaryOperations containsObject:operation]) {
+        operand1 = [self popOperand];
+        operand2 = [self popOperand];
+        if (!operand1) return (result = 0);
+        if (!operand2) return (result = 0);
+        
+        if ([@"+" isEqualToString:operation]) result = operand2 + operand1;
+        if ([@"-" isEqualToString:operation]) result = operand2 - operand1;
+        if ([@"*" isEqualToString:operation]) result = operand2 * operand1;
+        if ([@"/" isEqualToString:operation]) {
+            if (operand1)
+                result = operand2 / operand1;
+            else 
+                result = 0;
         }
     }
+    
+    // handle zero operand operations
+    if ([@"Pi" isEqualToString:operation]) result = M_PI;
+    
     
     [self pushOperand:result];
     return result;
