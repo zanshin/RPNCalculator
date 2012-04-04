@@ -56,7 +56,6 @@
     
 }
 
-
 - (IBAction)enterPressed 
 {
     [self.brain pushOperand:[self.display.text doubleValue]];
@@ -71,6 +70,16 @@
     double result = [self.brain performOperation:sender.currentTitle];
     NSString *resultString = [NSString stringWithFormat:@"%g", result];
     self.display.text = resultString;
+}
+
+- (IBAction)clearPressed:(id)sender 
+{
+    // clear button pressed, clear display and historyDisplay
+
+    self.display.text = @"0";
+    [self enterPressed];
+    self.userIsInTheMiddleOfEnteringANumber = NO;
+
 }
 
 @end
