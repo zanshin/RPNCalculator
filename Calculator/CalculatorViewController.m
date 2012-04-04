@@ -120,6 +120,28 @@
 }
 
 //
+// clearErrorPressed method
+// Allows user to remove, one digit at a time, numbers from the display.
+// Last digit displayed, i.e., the first one entered, cannot currently be removed.
+//
+- (IBAction)clearErrorPressed:(id)sender 
+{
+    if (self.userIsInTheMiddleOfEnteringANumber)
+    {
+        NSInteger currentDisplayLength = self.display.text.length;
+        if (currentDisplayLength == 1)
+        {
+            self.userIsInTheMiddleOfEnteringANumber = NO;
+        } else {
+            NSString *lastDigit = [self.display.text substringFromIndex:currentDisplayLength - 1];
+            self.display.text = [self.display.text substringToIndex:currentDisplayLength -1];
+            if ([lastDigit isEqualToString:@"."])
+                self.numberHasDecimalPoint = NO;
+        }
+    }
+}
+
+//
 // clearhistoryDisplay method
 // Clears the history display using the index value captured when last operation was entered.
 //
