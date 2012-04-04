@@ -23,11 +23,20 @@
     return _operandStack;
 }
 
+//
+// pushOperand method
+// Add the latest operand (number) to the stack
+//
 - (void)pushOperand:(double)operand
 {
     [self.operandStack addObject:[NSNumber numberWithDouble:operand]];
 }
 
+//
+// popOperand method
+// Remove the top item from the stack. Since the stack is implemented as an
+// array, we just remove the last object from the array.
+//
 - (double)popOperand
 {
     NSNumber *operandObject = [self.operandStack lastObject];
@@ -35,6 +44,12 @@
     return [operandObject doubleValue];
 }
 
+//
+// performOperation method
+// Build two sets, one for single operand operations (unary) and one for dual operand
+// operations (binary). Use these to make sure we have the corrent number of operands
+// for the operation being performed. 
+//
 - (double)performOperation:(NSString *)operation
 {
     double result = 0;

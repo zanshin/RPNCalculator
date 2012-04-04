@@ -10,11 +10,13 @@
 #import "CalculatorBrain.h"
 
 @interface CalculatorViewController ()
+
 @property (nonatomic) BOOL userIsInTheMiddleOfEnteringANumber;
 @property (nonatomic) BOOL numberHasDecimalPoint;
 @property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic) int historyToClear;
 @property (nonatomic) BOOL clearHistory;
+
 @end
 
 @implementation CalculatorViewController
@@ -34,7 +36,11 @@
     return _brain;
 }
 
+//
 // digitPressed method
+// Handle pressing of any of the digit buttons (0-9) and the decimal button (.).
+// Allows only a single decimal per number, allows for leading decimal.
+//
 - (IBAction)digitPressed:(UIButton *)sender 
 {
     NSString *digit = [sender currentTitle];
@@ -63,7 +69,11 @@
     
 }
 
+//
 // enterPressed method
+// Captures the number which has been entered a digit at a time, adds the number
+// to the history display, toggles userIsInTheMiddleOfEnteringANumber BOOL
+//
 - (IBAction)enterPressed 
 {
     [self.brain pushOperand:[self.display.text doubleValue]];
@@ -71,7 +81,12 @@
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
+//
 // operationPressed method
+// Captures the operation selected. Adds that operation to the history display. Calls
+// performOperation method on CalculatorBrain instance and displays result.
+// History display is truncated to only show operands for last operation.
+//
 - (IBAction)operationPressed:(UIButton *)sender 
 {
     // if the user wants they can skip the enter after the final digit
@@ -88,7 +103,10 @@
     self.clearHistory = YES;
 }
 
+//
 // clearPressed method
+// Clears main display and history display.
+//
 - (IBAction)clearPressed:(id)sender 
 {
     // clear button pressed, clear display and historyDisplay
@@ -101,12 +119,10 @@
 
 }
 
-- (void)viewDidUnload {
-    [self setHistoryDisplay:nil];
-    [super viewDidUnload];
-}
-
-// clear historyDisplay
+//
+// clearhistoryDisplay method
+// Clears the history display using the index value captured when last operation was entered.
+//
 - (void)clearHistoryDisplay
 {
     if (self.clearHistory) {
@@ -115,7 +131,10 @@
     }
 }
 
-// append operands and operations to historyDisplay UILabel
+//
+// addToHistory method
+// Append operands and operations to historyDisplay.
+//
 - (void)addToHistory:(NSString *)textToAdd
 {
     if (self.historyToClear) [self clearHistoryDisplay]; 
@@ -123,4 +142,5 @@
     self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:textToAdd];
     self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:@" "];
 }
+
 @end
