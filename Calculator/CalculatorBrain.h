@@ -13,4 +13,14 @@
 - (void)pushOperand:(double)operand;
 - (double)performOperation:(NSString *)operation;
 
+//
+// Assignment 2 additions
+// A property to hold the program and two class methods to work with the program
+//
+@property (readonly) id program;
+
+
++ (double)runProgram:(id)program;
++ (NSString *)descriptionOfProgram:(id)program;
+
 @end

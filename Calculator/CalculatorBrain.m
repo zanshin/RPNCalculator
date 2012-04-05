@@ -10,22 +10,22 @@
 
 @interface CalculatorBrain()
 
-@property (nonatomic, strong) NSMutableArray *operandStack;
+@property (nonatomic, strong) NSMutableArray *programStack;
 
 @end
 
 @implementation CalculatorBrain
 
-@synthesize operandStack = _operandStack;
+@synthesize programStack = _programStack;
 
 //
-// operandStack getter
+// programStack getter
 // Uses lazy instantiation to allocate and initialize object on its first use
 //
-- (NSMutableArray *)operandStack
+- (NSMutableArray *)programStack
 {
-    if (_operandStack == nil) _operandStack = [[NSMutableArray alloc] init];
-    return _operandStack;
+    if (_programStack == nil) _programStack = [[NSMutableArray alloc] init];
+    return _programStack;
 }
 
 //
@@ -34,19 +34,7 @@
 //
 - (void)pushOperand:(double)operand
 {
-    [self.operandStack addObject:[NSNumber numberWithDouble:operand]];
-}
-
-//
-// popOperand method
-// Remove the top item from the stack. Since the stack is implemented as an
-// array, we just remove the last object from the array.
-//
-- (double)popOperand
-{
-    NSNumber *operandObject = [self.operandStack lastObject];
-    if (operandObject) [self.operandStack removeLastObject];
-    return [operandObject doubleValue];
+    [self.programStack addObject:[NSNumber numberWithDouble:operand]];
 }
 
 //
@@ -57,50 +45,98 @@
 //
 - (double)performOperation:(NSString *)operation
 {
+    
+    [self.programStack addObject:operation];
+    return [CalculatorBrain runProgram:self.program];
+}
+
+//
+// implement a getter for the program property
+// only need a getter since it is a readonly property
+//
+- (id)program
+{
+    return [self.programStack copy];
+}
+
+//
+// class method that returns a human readable copy of the current
+// program 
+//
++ (NSString *)descriptionOfProgram:(id)program
+{
+    return @"Implement this in assignment #2";
+}
+
++ (double)popOperandOffStack:(NSMutableArray *)stack
+{
     double result = 0;
     
-    // sets to hold related operations
-    NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
-    NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
+    // pop something off the stack
+    id topOfStack = [stack lastObject];
+    if (topOfStack) [stack removeLastObject];
     
-    double operand1, operand2;
-    
-    // handle single operand operations
-    if ([unaryOperations containsObject:operation]) {
-        operand1 = [self popOperand];
-        if (!operand1) return (result = 0);
-
-        if ([@"sin" isEqualToString:operation]) result = sin(operand1);
-        if ([@"cos" isEqualToString:operation]) result = cos(operand1);
-        if ([@"Sqrt" isEqualToString:operation]) result = sqrt(operand1);
-        if ([@"±" isEqualToString:operation]) result = -operand1;
-
-    }
-
-    // handle double operand operations
-    if ([binaryOperations containsObject:operation]) {
-        operand1 = [self popOperand];
-        operand2 = [self popOperand];
-        if (!operand1) return (result = 0);
-        if (!operand2) return (result = 0);
+    // handle number or operation
+    if ([topOfStack isKindOfClass:[NSNumber class]])
+    {
+        result = [topOfStack doubleValue];
+    } else if ([topOfStack isKindOfClass:[NSString class]])
+    {
+        NSString *operation = topOfStack;
         
-        if ([@"+" isEqualToString:operation]) result = operand2 + operand1;
-        if ([@"-" isEqualToString:operation]) result = operand2 - operand1;
-        if ([@"*" isEqualToString:operation]) result = operand2 * operand1;
-        if ([@"/" isEqualToString:operation]) {
-            if (operand1)
-                result = operand2 / operand1;
-            else 
-                result = 0;
+        // sets to hold related operations
+        NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
+        NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
+        
+        double operand1, operand2;
+        
+        // handle single operand operations
+        if ([unaryOperations containsObject:operation]) {
+            operand1 = [self popOperandOffStack:stack];
+            if (!operand1) return (result = 0);
+            
+            if ([@"sin" isEqualToString:operation]) result = sin(operand1);
+            if ([@"cos" isEqualToString:operation]) result = cos(operand1);
+            if ([@"Sqrt" isEqualToString:operation]) result = sqrt(operand1);
+            if ([@"±" isEqualToString:operation]) result = -operand1;
+            
         }
+        
+        // handle double operand operations
+        if ([binaryOperations containsObject:operation]) {
+            operand1 = [self popOperandOffStack:stack];
+            operand2 = [self popOperandOffStack:stack];
+            if (!operand1) return (result = 0);
+            if (!operand2) return (result = 0);
+            
+            if ([@"+" isEqualToString:operation]) result = operand2 + operand1;
+            if ([@"-" isEqualToString:operation]) result = operand2 - operand1;
+            if ([@"*" isEqualToString:operation]) result = operand2 * operand1;
+            if ([@"/" isEqualToString:operation]) {
+                if (operand1)
+                    result = operand2 / operand1;
+                else 
+                    result = 0;
+            }
+        }
+        
+        // handle zero operand operations
+        if ([@"Pi" isEqualToString:operation]) result = M_PI;
     }
     
-    // handle zero operand operations
-    if ([@"Pi" isEqualToString:operation]) result = M_PI;
-    
-    
-    [self pushOperand:result];
     return result;
+}
+
++ (double)runProgram:(id)program
+{
+    NSMutableArray *stack;
+    if ([program isKindOfClass:[NSArray class]])
+    {
+        stack = [program mutableCopy];
+    }
+    
+    return [self popOperandOffStack:stack];
+    
 }
 
 @end
