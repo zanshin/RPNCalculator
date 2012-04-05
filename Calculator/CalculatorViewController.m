@@ -47,7 +47,6 @@
     
     NSString *digit = [sender currentTitle];
     
-    
     if (self.userIsInTheMiddleOfEnteringANumber) 
     {
         if ([digit isEqualToString:@"."]) 

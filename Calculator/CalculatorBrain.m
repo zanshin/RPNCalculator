@@ -9,14 +9,18 @@
 #import "CalculatorBrain.h"
 
 @interface CalculatorBrain()
+
 @property (nonatomic, strong) NSMutableArray *operandStack;
+
 @end
 
 @implementation CalculatorBrain
 
 @synthesize operandStack = _operandStack;
 
-// use thesetter to insure operandStack isn't nil when we need it
+//
+// use the setter to insure operandStack isn't nil when we need it
+//
 - (NSMutableArray *)operandStack
 {
     if (_operandStack == nil) _operandStack = [[NSMutableArray alloc] init];
