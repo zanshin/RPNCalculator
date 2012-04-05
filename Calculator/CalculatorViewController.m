@@ -11,9 +11,9 @@
 
 @interface CalculatorViewController ()
 
+@property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic) BOOL userIsInTheMiddleOfEnteringANumber;
 @property (nonatomic) BOOL numberHasDecimalPoint;
-@property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic) int historyToClear;
 @property (nonatomic) BOOL clearHistory;
 
@@ -29,7 +29,8 @@
 @synthesize historyToClear = _historyToClear;
 @synthesize clearHistory = _clearHistory;
 
-// setter for CalculatorBrain instance
+// CalculatorBrain getter
+// Uses lazy instantiation to allocate and initialize object on its first use
 - (CalculatorBrain *)brain
 {
     if (!_brain) _brain = [[CalculatorBrain alloc] init];

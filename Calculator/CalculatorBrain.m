@@ -19,7 +19,8 @@
 @synthesize operandStack = _operandStack;
 
 //
-// use the setter to insure operandStack isn't nil when we need it
+// operandStack getter
+// Uses lazy instantiation to allocate and initialize object on its first use
 //
 - (NSMutableArray *)operandStack
 {
