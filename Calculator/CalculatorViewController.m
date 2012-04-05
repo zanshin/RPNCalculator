@@ -43,6 +43,8 @@
 //
 - (IBAction)digitPressed:(UIButton *)sender 
 {
+    NSLog(@"digitPressed");
+    
     NSString *digit = [sender currentTitle];
     
     
@@ -76,6 +78,8 @@
 //
 - (IBAction)enterPressed 
 {
+    NSLog(@"enterPressed");
+    
     [self.brain pushOperand:[self.display.text doubleValue]];
     [self addToHistory:self.display.text];
     self.userIsInTheMiddleOfEnteringANumber = NO;
@@ -89,6 +93,8 @@
 //
 - (IBAction)operationPressed:(UIButton *)sender 
 {
+    NSLog(@"operationPressed");
+    
     // if the user wants they can skip the enter after the final digit
     if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     
@@ -109,12 +115,15 @@
 //
 - (IBAction)clearPressed:(id)sender 
 {
+    NSLog(@"clearPressed");
+    
     // clear button pressed, clear display and historyDisplay
 
     self.display.text = @"0";
     self.historyToClear = [self.historyDisplay.text length];
     self.clearHistory = YES;
-    [self enterPressed];
+    [self clearHistoryDisplay];
+    //[self enterPressed];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 
 }
@@ -123,9 +132,12 @@
 // clearErrorPressed method
 // Allows user to remove, one digit at a time, numbers from the display.
 // Last digit displayed, i.e., the first one entered, cannot currently be removed.
+// Can only remove digits while a number is being entered.
 //
 - (IBAction)clearErrorPressed:(id)sender 
 {
+    NSLog(@"clearErrorPressed");
+    
     if (self.userIsInTheMiddleOfEnteringANumber)
     {
         NSInteger currentDisplayLength = self.display.text.length;
@@ -147,6 +159,8 @@
 //
 - (void)clearHistoryDisplay
 {
+    NSLog(@"clearHistoryDisplay");
+    
     if (self.clearHistory) {
         self.historyDisplay.text = [self.historyDisplay.text substringFromIndex:self.historyToClear];
         self.clearHistory = NO;
@@ -159,6 +173,8 @@
 //
 - (void)addToHistory:(NSString *)textToAdd
 {
+    NSLog(@"addToHistory");
+    
     if (self.historyToClear) [self clearHistoryDisplay]; 
     
     self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:textToAdd];
