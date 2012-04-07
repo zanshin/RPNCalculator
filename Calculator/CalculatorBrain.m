@@ -68,6 +68,13 @@
     return [validOperations containsObject:operation];
 }
 
+// return TRUE if the operation requires no operands
++ (BOOL)nonaryOperator:(NSString *)operation
+{
+    NSSet *nonaryOperations = [[NSSet alloc] initWithObjects:@"Pi", nil];
+    return [nonaryOperations containsObject:operation];
+}
+
 // return TRUE if the operation requires only one operand
 + (BOOL)unaryOperator:(NSString *)operation
 {
@@ -82,10 +89,92 @@
     return [binaryOperations containsObject:operation];
 }
 
+// return TRUE if the program is an NSArray
++ (BOOL)isValidProgram:(id)program {
+    return [program isKindOfClass:[NSArray class]];
+}
+
 // return a human readable string of the current program
 + (NSString *)descriptionOfProgram:(id)program
 {
-    return @"Implement this in assignment #2";
+    // Check program is valid and if not return message
+    if (![self isValidProgram:program]) return @"Invalid program!";
+    
+    NSMutableArray *stack= [program mutableCopy];
+    NSMutableArray *expressionArray = [NSMutableArray array];
+    
+    // Call recursive method to describe the stack, removing superfluous brackets at the
+    // start and end of the resulting expression. Add the result into an expression array
+    // and continue if there are still more items in the stack. 
+    // our description Array, and if the 
+    while (stack.count > 0) {
+        [expressionArray addObject:[self stripParens:[self descriptionOffTopOfStack:stack]]];
+    }
+    
+    // Return a list of comma seperated programs
+    return [expressionArray componentsJoinedByString:@","]; 
+}
+
++ (NSString *)descriptionOffTopOfStack:(NSMutableArray *)stack {
+    
+    NSString *description;
+    
+    id topOfStack = [stack lastObject];
+    if (topOfStack) [stack removeLastObject]; else return @"";
+    
+    // for numbers just return as a string
+    if ([topOfStack isKindOfClass:[NSNumber class]]) {
+        return [topOfStack description];
+    }       
+    else if ([topOfStack isKindOfClass:[NSString class]]) { 
+        // for no operand operation, or variables return description in the form "x"
+        if (![self isOperation:topOfStack] || [self nonaryOperator:topOfStack]) 
+            description = topOfStack;
+        // for unary operation return in the form "f(x)"
+        else if ([self unaryOperator:topOfStack]) 
+        {
+            NSString *x = [self stripParens:[self descriptionOffTopOfStack:stack]];
+            description = [NSString stringWithFormat:@"%@(%@)", topOfStack, x]; 
+        }
+        // for binary operations return in the form "x op. y"
+        else if ([self binaryOperator:topOfStack]) {
+            NSString *y = [self descriptionOffTopOfStack:stack];
+            NSString *x = [self descriptionOffTopOfStack:stack];
+            
+            // for + and - add parens to support precedence rules 
+            if ([topOfStack isEqualToString:@"+"] || 
+                [topOfStack isEqualToString:@"-"]) {               
+                description = [NSString stringWithFormat:@"(%@ %@ %@)", [self stripParens:x], topOfStack, [self stripParens:y]];
+            } 
+            // for * or / no need for parens
+            else {
+                description = [NSString stringWithFormat:@"%@ %@ %@",
+                               x, topOfStack ,y];
+            }
+        }       
+    }
+    return description ;        
+}
+
++ (NSString *)stripParens:(NSString *)expression {
+    
+    NSString *description = expression;
+    
+    // Check to see if there is a paren at the start and end of the expression
+    // If so, then strip the description of these parens and return.
+    if ([expression hasPrefix:@"("] && [expression hasSuffix:@")"]) {
+        description = [description substringFromIndex:1];
+        description = [description substringToIndex:[description length] - 1];
+    }   
+    
+    // Also need to do a final check, to cover the case where removing the parens
+    // results in a + b) * (c + d. Have a look at the position of the brackets and
+    // if there is a ) before a (, then we need to revert back to expression
+    NSRange openParen = [description rangeOfString:@"("];
+    NSRange closeParen = [description rangeOfString:@")"];
+    
+    if (openParen.location <= closeParen.location) return description;
+    else return expression; 
 }
 
 // if the topOfStack is a number return it, otherwise determine the operation

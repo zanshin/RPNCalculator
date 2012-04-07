@@ -188,20 +188,20 @@
 - (IBAction)test1Pressed 
 {
     // create a test instance of the brain
-    CalculatorBrain *testBrain = [self brain];
+    CalculatorBrain *test1Brain = [self brain];
     
     // Setup the brain
-    [testBrain pushVariable:@"a"];
-    [testBrain pushVariable:@"a"];
-    [testBrain pushOperation:@"*"];
-    [testBrain pushVariable:@"b"];
-    [testBrain pushVariable:@"b"];
-    [testBrain pushOperation:@"*"];
-    [testBrain pushOperation:@"+"];
-    [testBrain pushOperation:@"Sqrt"];  
+    [test1Brain pushVariable:@"a"];
+    [test1Brain pushVariable:@"a"];
+    [test1Brain pushOperation:@"*"];
+    [test1Brain pushVariable:@"b"];
+    [test1Brain pushVariable:@"b"];
+    [test1Brain pushOperation:@"*"];
+    [test1Brain pushOperation:@"+"];
+    [test1Brain pushOperation:@"Sqrt"];  
     
     // Retrieve the program
-    NSArray *program = testBrain.program;
+    NSArray *program = test1Brain.program;
     
     // Setup the dictionary
     NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys: 
@@ -215,6 +215,58 @@
     // List the variables in program    
     NSLog(@"Variables in program are %@", 
           [[CalculatorBrain variablesUsedInProgram:program] description]);
+}
+
+- (IBAction)test2Pressed 
+{
+    CalculatorBrain *test2Brain = [self brain];
+    
+    // Test a
+    [test2Brain pushOperand:3];
+    [test2Brain pushOperand:5];
+    [test2Brain pushOperand:6];
+    [test2Brain pushOperand:7];
+    [test2Brain pushOperation:@"+"];
+    [test2Brain pushOperation:@"*"];
+    [test2Brain pushOperation:@"-"];
+    
+    // Test b
+    [test2Brain pushOperand:3];
+    [test2Brain pushOperand:5];
+    [test2Brain pushOperation:@"+"];
+    [test2Brain pushOperation:@"sqrt"];
+    
+    // Test c
+    //[testBrain empty];
+    [test2Brain pushOperand:3];
+    [test2Brain pushOperation:@"sqrt"];
+    [test2Brain pushOperation:@"sqrt"];
+    
+    // Test d
+    [test2Brain pushOperand:3];
+    [test2Brain pushOperand:5];
+    [test2Brain pushOperation:@"sqrt"];
+    [test2Brain pushOperation:@"+"];
+    
+    // Test e
+    [test2Brain pushOperation:@"?"];
+    [test2Brain pushVariable:@"r"];
+    [test2Brain pushVariable:@"r"];
+    [test2Brain pushOperation:@"*"];
+    [test2Brain pushOperation:@"*"];
+    
+    // Test f
+    [test2Brain pushVariable:@"a"];
+    [test2Brain pushVariable:@"a"];
+    [test2Brain pushOperation:@"*"];
+    [test2Brain pushVariable:@"b"];
+    [test2Brain pushVariable:@"b"];
+    [test2Brain pushOperation:@"*"];
+    [test2Brain pushOperation:@"+"];
+    [test2Brain pushOperation:@"sqrt"];
+    
+    //Print the description
+    NSLog(@"Program is :%@",[CalculatorBrain descriptionOfProgram:[test2Brain program]]);
 }
 
 
