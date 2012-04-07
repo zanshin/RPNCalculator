@@ -18,31 +18,29 @@
 
 @synthesize programStack = _programStack;
 
-//
-// programStack getter
-// Uses lazy instantiation to allocate and initialize object on its first use
-//
+#pragma mark - Getters
 - (NSMutableArray *)programStack
 {
     if (_programStack == nil) _programStack = [[NSMutableArray alloc] init];
     return _programStack;
 }
 
-//
-// pushOperand method
-// Add the latest operand (number) to the stack
-//
+- (id)program
+{
+    return [self.programStack copy];
+}
+
+#pragma mark - Instance methods
 - (void)pushOperand:(double)operand
 {
     [self.programStack addObject:[NSNumber numberWithDouble:operand]];
 }
 
-//
-// performOperation method
-// Build two sets, one for single operand operations (unary) and one for dual operand
-// operations (binary). Use these to make sure we have the corrent number of operands
-// for the operation being performed. 
-//
+- (void)pushVariable:(NSString *)variable
+{
+    [self.programStack addObject:variable];
+}
+
 - (double)performOperation:(NSString *)operation
 {
     
@@ -50,19 +48,28 @@
     return [CalculatorBrain runProgram:self.program];
 }
 
-//
-// implement a getter for the program property
-// only need a getter since it is a readonly property
-//
-- (id)program
+
+#pragma mark - Class methods
+// helper methods to work with our supported operations
++ (BOOL)isOperation:(NSString *)operation
 {
-    return [self.programStack copy];
+    NSSet *validOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±",@"+", @"-", @"*", @"/", nil];
+    return [validOperations containsObject:operation];
 }
 
-//
-// class method that returns a human readable copy of the current
-// program 
-//
++ (BOOL)unaryOperator:(NSString *)operation
+{
+    NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
+    return [unaryOperations containsObject:operation];
+}
+
++ (BOOL)binaryOperator:(NSString *)operation
+{
+    NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
+    return [binaryOperations containsObject:operation];
+}
+
+// return a human readable string of the current program
 + (NSString *)descriptionOfProgram:(id)program
 {
     return @"Implement this in assignment #2";
@@ -84,14 +91,10 @@
     {
         NSString *operation = topOfStack;
         
-        // sets to hold related operations
-        NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
-        NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
-        
         double operand1, operand2;
         
         // handle single operand operations
-        if ([unaryOperations containsObject:operation]) {
+        if ([self unaryOperator:operation]) {
             operand1 = [self popOperandOffStack:stack];
             if (!operand1) return (result = 0);
             
@@ -99,11 +102,10 @@
             if ([@"cos" isEqualToString:operation]) result = cos(operand1);
             if ([@"Sqrt" isEqualToString:operation]) result = sqrt(operand1);
             if ([@"±" isEqualToString:operation]) result = -operand1;
-            
         }
         
         // handle double operand operations
-        if ([binaryOperations containsObject:operation]) {
+        if ([self binaryOperator:operation]) {
             operand1 = [self popOperandOffStack:stack];
             operand2 = [self popOperandOffStack:stack];
             if (!operand1) return (result = 0);
