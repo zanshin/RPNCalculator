@@ -23,5 +23,6 @@
 + (NSString *)descriptionOfProgram:(id)program;
 
 - (void)pushVariable:(NSString *)variable;
+- (void)pushOperation:(NSString *)operation;
 
 @end

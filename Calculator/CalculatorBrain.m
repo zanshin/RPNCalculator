@@ -41,6 +41,10 @@
     [self.programStack addObject:variable];
 }
 
+- (void)pushOperation:(NSString *) operation {
+    [self.programStack addObject:operation];    
+}
+
 - (double)performOperation:(NSString *)operation
 {
     
@@ -129,16 +133,56 @@
     return result;
 }
 
+// vanilia runProgram - just calls runProgram:usingVariableValues with a nil dictionary
 + (double)runProgram:(id)program
 {
-    NSMutableArray *stack;
+    return [self runProgram:program usingVariableValues:nil];
+}
+
+// runProgram using variables
++ (double) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
+{
     if ([program isKindOfClass:[NSArray class]])
     {
-        stack = [program mutableCopy];
+        NSMutableArray *stack= [program mutableCopy];
+        
+        // can't enumerate over stack since we'll mutate it as we go
+        for (int i=0; i < [stack count]; i++) 
+        {
+            id obj = [stack objectAtIndex:i]; 
+            
+            if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) 
+            {  
+                id value = [variableValues objectForKey:obj];           
+                if (![value isKindOfClass:[NSNumber class]]) value = [NSNumber numberWithInt:0];
+
+                // replace program variable with value.
+                [stack replaceObjectAtIndex:i withObject:value];
+            }       
+        }   
+
+        return [self popOperandOffStack:stack];  
+    } else {
+        return 0; // in the unlikely event we weren't passed an array
     }
+}
+
++ (NSSet *)variablesUsedInProgram:(id)program { 
     
-    return [self popOperandOffStack:stack];
+    if (![program isKindOfClass:[NSArray class]]) return nil;
     
+    NSMutableSet *variables = [NSMutableSet set];
+    
+    for (id obj in program) {
+        if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) {
+            [variables addObject:obj];  
+        }
+    }   
+    // if no variables return nil
+    if ([variables count] == 0) 
+        return nil; 
+    else 
+        return [variables copy];
 }
 
 @end
