@@ -198,7 +198,7 @@
     [testBrain pushVariable:@"b"];
     [testBrain pushOperation:@"*"];
     [testBrain pushOperation:@"+"];
-    [testBrain pushOperation:@"sqrt"];  
+    [testBrain pushOperation:@"Sqrt"];  
     
     // Retrieve the program
     NSArray *program = testBrain.program;

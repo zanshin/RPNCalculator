@@ -136,14 +136,17 @@
 // vanilia runProgram - just calls runProgram:usingVariableValues with a nil dictionary
 + (double)runProgram:(id)program
 {
+    NSLog(@"runProgram");
     return [self runProgram:program usingVariableValues:nil];
 }
 
 // runProgram using variables
 + (double) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
 {
+    NSLog(@"runProgram:usingVariableValues");
     if ([program isKindOfClass:[NSArray class]])
     {
+        NSLog(@"runProgram:usingVariableValues - program is an NSArray");
         NSMutableArray *stack= [program mutableCopy];
         
         // can't enumerate over stack since we'll mutate it as we go
@@ -154,13 +157,19 @@
             if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) 
             {  
                 id value = [variableValues objectForKey:obj];           
-                if (![value isKindOfClass:[NSNumber class]]) value = [NSNumber numberWithInt:0];
+                if (![value isKindOfClass:[NSNumber class]]) 
+                {
+                    NSLog(@"runProgram:usingVariableValues - value isn't NSNumber - set to zero");
+                    NSLog(@"value is %@", value);
+                    value = [NSNumber numberWithInt:0];
+                }
 
                 // replace program variable with value.
                 [stack replaceObjectAtIndex:i withObject:value];
             }       
         }   
-
+        
+        // stack now contains operands (values) and operations, time to calculate
         return [self popOperandOffStack:stack];  
     } else {
         return 0; // in the unlikely event we weren't passed an array
@@ -169,6 +178,7 @@
 
 + (NSSet *)variablesUsedInProgram:(id)program { 
     
+    NSLog(@"variablesUsedInProgram");
     if (![program isKindOfClass:[NSArray class]]) return nil;
     
     NSMutableSet *variables = [NSMutableSet set];
