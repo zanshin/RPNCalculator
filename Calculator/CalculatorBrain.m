@@ -146,23 +146,16 @@
     NSLog(@"runProgram:usingVariableValues");
     if ([program isKindOfClass:[NSArray class]])
     {
-        NSLog(@"runProgram:usingVariableValues - program is an NSArray");
         NSMutableArray *stack= [program mutableCopy];
         
-        // can't enumerate over stack since we'll mutate it as we go
         for (int i=0; i < [stack count]; i++) 
         {
             id obj = [stack objectAtIndex:i]; 
-            
             if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) 
             {  
                 id value = [variableValues objectForKey:obj];           
                 if (![value isKindOfClass:[NSNumber class]]) 
-                {
-                    NSLog(@"runProgram:usingVariableValues - value isn't NSNumber - set to zero");
-                    NSLog(@"value is %@", value);
-                    value = [NSNumber numberWithInt:0];
-                }
+                    value = [NSNumber numberWithInt:0]; // if no value substitute zero
 
                 // replace program variable with value.
                 [stack replaceObjectAtIndex:i withObject:value];
@@ -171,7 +164,9 @@
         
         // stack now contains operands (values) and operations, time to calculate
         return [self popOperandOffStack:stack];  
-    } else {
+    } 
+    else 
+    {
         return 0; // in the unlikely event we weren't passed an array
     }
 }
