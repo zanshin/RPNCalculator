@@ -31,20 +31,25 @@
 }
 
 #pragma mark - Instance methods
+
+// add operands to the stack
 - (void)pushOperand:(double)operand
 {
     [self.programStack addObject:[NSNumber numberWithDouble:operand]];
 }
 
+// add variables to the stack
 - (void)pushVariable:(NSString *)variable
 {
     [self.programStack addObject:variable];
 }
 
+// add operations to the stack
 - (void)pushOperation:(NSString *) operation {
     [self.programStack addObject:operation];    
 }
 
+// perform calculation required by the operation
 - (double)performOperation:(NSString *)operation
 {
     
@@ -52,21 +57,25 @@
     return [CalculatorBrain runProgram:self.program];
 }
 
-
 #pragma mark - Class methods
+
 // helper methods to work with our supported operations
+
+// return TRUE if the operation is a supported one
 + (BOOL)isOperation:(NSString *)operation
 {
     NSSet *validOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±",@"+", @"-", @"*", @"/", nil];
     return [validOperations containsObject:operation];
 }
 
+// return TRUE if the operation requires only one operand
 + (BOOL)unaryOperator:(NSString *)operation
 {
     NSSet *unaryOperations = [[NSSet alloc] initWithObjects:@"sin", @"cos", @"Sqrt", @"±", nil];
     return [unaryOperations containsObject:operation];
 }
 
+// return TRUE if the operation requires two operands
 + (BOOL)binaryOperator:(NSString *)operation
 {
     NSSet *binaryOperations = [[NSSet alloc] initWithObjects:@"+", @"-", @"*", @"/", nil];
@@ -79,6 +88,8 @@
     return @"Implement this in assignment #2";
 }
 
+// if the topOfStack is a number return it, otherwise determine the operation
+// and perform the required calculation
 + (double)popOperandOffStack:(NSMutableArray *)stack
 {
     double result = 0;
@@ -140,7 +151,8 @@
     return [self runProgram:program usingVariableValues:nil];
 }
 
-// runProgram using variables
+// runProgram using variables locates variables and replaces them with the 
+// appropriate values from the dictionary
 + (double) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
 {
     NSLog(@"runProgram:usingVariableValues");
@@ -171,6 +183,7 @@
     }
 }
 
+// returns a set containing all the variables used in the program
 + (NSSet *)variablesUsedInProgram:(id)program { 
     
     NSLog(@"variablesUsedInProgram");
