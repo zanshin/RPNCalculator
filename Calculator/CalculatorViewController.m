@@ -217,6 +217,10 @@
           [[CalculatorBrain variablesUsedInProgram:program] description]);
 }
 
+//
+// test2Pressed
+// Construct several test programs and use them to test the descriptionOfProgram API
+//
 - (IBAction)test2Pressed 
 {
     CalculatorBrain *test2Brain = [self brain];
