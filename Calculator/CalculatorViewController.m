@@ -14,8 +14,8 @@
 @property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic) BOOL userIsInTheMiddleOfEnteringANumber;
 @property (nonatomic) BOOL numberHasDecimalPoint;
-@property (nonatomic) int historyToClear;
-@property (nonatomic) BOOL clearHistory;
+//@property (nonatomic) int historyToClear;
+//@property (nonatomic) BOOL clearHistory;
 
 @end
 
@@ -26,8 +26,8 @@
 @synthesize userIsInTheMiddleOfEnteringANumber = _userIsInTheMiddleOfEnteringANumber;
 @synthesize numberHasDecimalPoint = _numberHasDecimalPoint;
 @synthesize brain = _brain;
-@synthesize historyToClear = _historyToClear;
-@synthesize clearHistory = _clearHistory;
+//@synthesize historyToClear = _historyToClear;
+//@synthesize clearHistory = _clearHistory;
 
 // CalculatorBrain getter
 // Uses lazy instantiation to allocate and initialize object on its first use
@@ -81,7 +81,7 @@
     NSLog(@"enterPressed");
     
     [self.brain pushOperand:[self.display.text doubleValue]];
-    [self addToHistory:self.display.text];
+    //[self addToHistory:self.display.text];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
@@ -98,15 +98,16 @@
     // if the user wants they can skip the enter after the final digit
     if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
     
-    [self addToHistory:sender.currentTitle];
+    //[self addToHistory:sender.currentTitle];
     
     double result = [self.brain performOperation:sender.currentTitle];
     NSString *resultString = [NSString stringWithFormat:@"%g", result];
     self.display.text = resultString;
     
-    self.historyToClear = [self.historyDisplay.text length];
-    [self addToHistory:resultString];
-    self.clearHistory = YES;
+    self.historyDisplay.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+    //self.historyToClear = [self.historyDisplay.text length];
+    //[self addToHistory:resultString];
+    //self.clearHistory = YES;
 }
 
 //
@@ -120,9 +121,9 @@
     // clear button pressed, clear display and historyDisplay
 
     self.display.text = @"0";
-    self.historyToClear = [self.historyDisplay.text length];
-    self.clearHistory = YES;
-    [self clearHistoryDisplay];
+    //self.historyToClear = [self.historyDisplay.text length];
+    //self.clearHistory = YES;
+    //[self clearHistoryDisplay];
     //[self enterPressed];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 
@@ -154,32 +155,46 @@
 }
 
 //
+// variablePressed method
+// push variable pressed onto the program stack
+//
+- (IBAction)variablePressed:(UIButton *)sender 
+{
+    [self.brain pushVariable:sender.currentTitle];
+}
+
+
+
+
+//
 // clearhistoryDisplay method
 // Clears the history display using the index value captured when last operation was entered.
 //
-- (void)clearHistoryDisplay
-{
-    NSLog(@"clearHistoryDisplay");
-    
-    if (self.clearHistory) {
-        self.historyDisplay.text = [self.historyDisplay.text substringFromIndex:self.historyToClear];
-        self.clearHistory = NO;
-    }
-}
+//- (void)clearHistoryDisplay
+//{
+//    NSLog(@"clearHistoryDisplay");
+//    
+//    if (self.clearHistory) {
+//        self.historyDisplay.text = [self.historyDisplay.text substringFromIndex:self.historyToClear];
+//        self.clearHistory = NO;
+//    }
+//}
 
 //
 // addToHistory method
 // Append operands and operations to historyDisplay.
 //
-- (void)addToHistory:(NSString *)textToAdd
-{
-    NSLog(@"addToHistory");
-    
-    if (self.historyToClear) [self clearHistoryDisplay]; 
-    
-    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:textToAdd];
-    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:@" "];
-}
+//- (void)addToHistory:(NSString *)textToAdd
+//{
+//    NSLog(@"addToHistory");
+//    
+//    if (self.historyToClear) [self clearHistoryDisplay]; 
+//    
+//    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:textToAdd];
+//    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:@" "];
+//}
+
+#pragma mark - Test methods
 
 //
 // test1Pressed method
