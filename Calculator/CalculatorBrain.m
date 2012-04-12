@@ -57,6 +57,11 @@
     return [[CalculatorBrain runProgram:self.program] doubleValue];
 }
 
+// remove the last item from the stack
+- (void)removeLastItem {
+    [self.programStack removeLastObject];
+}
+
 #pragma mark - Class methods
 
 // helper methods to work with our supported operations

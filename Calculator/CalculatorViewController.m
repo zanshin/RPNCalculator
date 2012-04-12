@@ -104,7 +104,7 @@
     
     double result = [self.brain performOperation:sender.currentTitle];
     NSString *resultString = [NSString stringWithFormat:@"%g", result];
-    //self.display.text = resultString;
+    self.display.text = resultString;
     
     self.historyDisplay.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     [self synchronizeView];
@@ -145,16 +145,21 @@
     NSLog(@"clearErrorPressed");
     
     if (self.userIsInTheMiddleOfEnteringANumber) {
-        NSInteger currentDisplayLength = self.display.text.length;
-        if (currentDisplayLength == 1) {
-            self.userIsInTheMiddleOfEnteringANumber = NO;
-        } else {
-            NSString *lastDigit = [self.display.text substringFromIndex:currentDisplayLength - 1];
-            self.display.text = [self.display.text substringToIndex:currentDisplayLength -1];
-            if ([lastDigit isEqualToString:@"."])
-                self.numberHasDecimalPoint = NO;
-        }
-    }
+        // Remove the last digit or point from the display
+        self.display.text =[self.display.text substringToIndex:
+                            [self.display.text length] - 1]; 
+        
+        // If we are left with no digits or a "-" digit
+        if ( [self.display.text isEqualToString:@""]
+            || [self.display.text isEqualToString:@"-"]) {
+            
+            [self synchronizeView];     
+        }   
+    } else {
+        // Remove the last item from the stack and synchronize the view
+        [self.brain removeLastItem];
+        [self synchronizeView];
+    } 
 }
 
 //

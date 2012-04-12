@@ -27,5 +27,6 @@
 
 - (void)pushVariable:(NSString *)variable;
 - (void)pushOperation:(NSString *)operation;
+- (void)removeLastItem;
 
 @end
