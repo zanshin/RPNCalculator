@@ -16,9 +16,6 @@
 @property (nonatomic) BOOL numberHasDecimalPoint;
 @property (nonatomic, strong) NSDictionary *testVariableValues;
 
-//@property (nonatomic) int historyToClear;
-//@property (nonatomic) BOOL clearHistory;
-
 @end
 
 @implementation CalculatorViewController
@@ -30,9 +27,6 @@
 @synthesize numberHasDecimalPoint = _numberHasDecimalPoint;
 @synthesize brain = _brain;
 @synthesize testVariableValues = _testVariableValues;
-
-//@synthesize historyToClear = _historyToClear;
-//@synthesize clearHistory = _clearHistory;
 
 // CalculatorBrain getter
 // Uses lazy instantiation to allocate and initialize object on its first use
@@ -83,7 +77,6 @@
     NSLog(@"enterPressed");
     
     [self.brain pushOperand:[self.display.text doubleValue]];
-    //[self addToHistory:self.display.text];
     self.userIsInTheMiddleOfEnteringANumber = NO;
 }
 
@@ -108,9 +101,7 @@
     
     self.historyDisplay.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
     [self synchronizeView];
-    //self.historyToClear = [self.historyDisplay.text length];
-    //[self addToHistory:resultString];
-    //self.clearHistory = YES;
+
 }
 
 //
@@ -125,12 +116,6 @@
 
     self.display.text = @"0";
     self.historyDisplay.text = @"";
-    //self.historyToClear = [self.historyDisplay.text length];
-    //self.clearHistory = YES;
-    //[self clearHistoryDisplay];
-    //[self enterPressed];
-    //self.userIsInTheMiddleOfEnteringANumber = NO;
-    //[self synchronizeView];
 
 }
 
@@ -212,34 +197,6 @@
     return [self.testVariableValues dictionaryWithValuesForKeys:variableArray];
 }
 
-
-//
-// clearhistoryDisplay method
-// Clears the history display using the index value captured when last operation was entered.
-//
-//- (void)clearHistoryDisplay
-//{
-//    NSLog(@"clearHistoryDisplay");
-//    
-//    if (self.clearHistory) {
-//        self.historyDisplay.text = [self.historyDisplay.text substringFromIndex:self.historyToClear];
-//        self.clearHistory = NO;
-//    }
-//}
-
-//
-// addToHistory method
-// Append operands and operations to historyDisplay.
-//
-//- (void)addToHistory:(NSString *)textToAdd
-//{
-//    NSLog(@"addToHistory");
-//    
-//    if (self.historyToClear) [self clearHistoryDisplay]; 
-//    
-//    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:textToAdd];
-//    self.historyDisplay.text = [self.historyDisplay.text stringByAppendingString:@" "];
-//}
 
 #pragma mark - Test methods
 - (IBAction)test1Pressed 

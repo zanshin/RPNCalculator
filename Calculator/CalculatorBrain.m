@@ -193,11 +193,9 @@
     if (topOfStack) [stack removeLastObject];
     
     // handle number or operation
-    if ([topOfStack isKindOfClass:[NSNumber class]])
-    {
+    if ([topOfStack isKindOfClass:[NSNumber class]]) {
         result = [topOfStack doubleValue];
-    } else if ([topOfStack isKindOfClass:[NSString class]])
-    {
+    } else if ([topOfStack isKindOfClass:[NSString class]]) {
         NSString *operation = topOfStack;
         
         id operand1, operand2;
@@ -256,15 +254,12 @@
 + (id)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
 {
     NSLog(@"runProgram:usingVariableValues");
-    if ([program isKindOfClass:[NSArray class]])
-    {
+    if ([program isKindOfClass:[NSArray class]]) {
         NSMutableArray *stack= [program mutableCopy];
         
-        for (int i=0; i < [stack count]; i++) 
-        {
+        for (int i=0; i < [stack count]; i++) {
             id obj = [stack objectAtIndex:i]; 
-            if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) 
-            {  
+            if ([obj isKindOfClass:[NSString class]] && ![self isOperation:obj]) {  
                 id value = [variableValues objectForKey:obj];           
                 if (![value isKindOfClass:[NSNumber class]]) 
                     value = [NSNumber numberWithInt:0]; // if no value substitute zero
@@ -276,9 +271,7 @@
         
         // stack now contains operands (values) and operations, time to calculate
         return [self popOperandOffStack:stack];  
-    } 
-    else 
-    {
+    } else {
         return 0; // in the unlikely event we weren't passed an array
     }
 }
