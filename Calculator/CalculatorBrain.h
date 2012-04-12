@@ -19,10 +19,10 @@
 //
 @property (readonly) id program;
 
-+ (double)runProgram:(id)program;
++ (id)runProgram:(id)program;
 + (NSString *)descriptionOfProgram:(id)program;
 
-+ (double) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues;
++ (id) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues;
 + (NSSet *)variablesUsedInProgram:(id)program;
 
 - (void)pushVariable:(NSString *)variable;

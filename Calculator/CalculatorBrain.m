@@ -54,7 +54,7 @@
 {
     
     [self.programStack addObject:operation];
-    return [CalculatorBrain runProgram:self.program];
+    return [[CalculatorBrain runProgram:self.program] doubleValue];
 }
 
 #pragma mark - Class methods
@@ -179,7 +179,7 @@
 
 // if the topOfStack is a number return it, otherwise determine the operation
 // and perform the required calculation
-+ (double)popOperandOffStack:(NSMutableArray *)stack
++ (id)popOperandOffStack:(NSMutableArray *)stack
 {
     double result = 0;
     
@@ -195,32 +195,38 @@
     {
         NSString *operation = topOfStack;
         
-        double operand1, operand2;
+        id operand1, operand2;
+        double dOperand1, dOperand2;
         
         // handle single operand operations
         if ([self unaryOperator:operation]) {
             operand1 = [self popOperandOffStack:stack];
-            if (!operand1) return (result = 0);
+            if (!operand1) return [@"" stringByAppendingFormat:@"Insufficient operands for %@", operation];
             
-            if ([@"sin" isEqualToString:operation]) result = sin(operand1);
-            if ([@"cos" isEqualToString:operation]) result = cos(operand1);
-            if ([@"Sqrt" isEqualToString:operation]) result = sqrt(operand1);
-            if ([@"±" isEqualToString:operation]) result = -operand1;
+            dOperand1 = [(NSNumber *) operand1 doubleValue];
+            
+            if ([@"sin" isEqualToString:operation]) result = sin(dOperand1);
+            if ([@"cos" isEqualToString:operation]) result = cos(dOperand1);
+            if ([@"Sqrt" isEqualToString:operation]) result = sqrt(dOperand1);
+            if ([@"±" isEqualToString:operation]) result = -dOperand1;
         }
         
         // handle double operand operations
         if ([self binaryOperator:operation]) {
             operand1 = [self popOperandOffStack:stack];
             operand2 = [self popOperandOffStack:stack];
-            if (!operand1) return (result = 0);
-            if (!operand2) return (result = 0);
+            if (!operand1) return [@"" stringByAppendingFormat:@"Insufficient operands for %@", operation];
+            if (!operand2) return [@"" stringByAppendingFormat:@"Insufficient operands for %@", operation];
             
-            if ([@"+" isEqualToString:operation]) result = operand2 + operand1;
-            if ([@"-" isEqualToString:operation]) result = operand2 - operand1;
-            if ([@"*" isEqualToString:operation]) result = operand2 * operand1;
+            dOperand1 = [(NSNumber *) operand1 doubleValue];
+            dOperand2 = [(NSNumber *) operand2 doubleValue];
+            
+            if ([@"+" isEqualToString:operation]) result = dOperand2 + dOperand1;
+            if ([@"-" isEqualToString:operation]) result = dOperand2 - dOperand1;
+            if ([@"*" isEqualToString:operation]) result = dOperand2 * dOperand1;
             if ([@"/" isEqualToString:operation]) {
                 if (operand1)
-                    result = operand2 / operand1;
+                    result = dOperand2 / dOperand1;
                 else 
                     result = 0;
             }
@@ -230,11 +236,11 @@
         if ([@"Pi" isEqualToString:operation]) result = M_PI;
     }
     
-    return result;
+    return [NSNumber numberWithDouble:result];
 }
 
 // vanilia runProgram - just calls runProgram:usingVariableValues with a nil dictionary
-+ (double)runProgram:(id)program
++ (id)runProgram:(id)program
 {
     NSLog(@"runProgram");
     return [self runProgram:program usingVariableValues:nil];
@@ -242,7 +248,7 @@
 
 // runProgram using variables locates variables and replaces them with the 
 // appropriate values from the dictionary
-+ (double) runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
++ (id)runProgram:(id)program usingVariableValues:(NSDictionary *)variableValues 
 {
     NSLog(@"runProgram:usingVariableValues");
     if ([program isKindOfClass:[NSArray class]])

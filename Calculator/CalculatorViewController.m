@@ -14,6 +14,8 @@
 @property (nonatomic, strong) CalculatorBrain *brain;
 @property (nonatomic) BOOL userIsInTheMiddleOfEnteringANumber;
 @property (nonatomic) BOOL numberHasDecimalPoint;
+@property (nonatomic, strong) NSDictionary *testVariableValues;
+
 //@property (nonatomic) int historyToClear;
 //@property (nonatomic) BOOL clearHistory;
 
@@ -23,9 +25,12 @@
 
 @synthesize display = _display;
 @synthesize historyDisplay = _historyDisplay;
+@synthesize variablesDisplay = _variablesDisplay;
 @synthesize userIsInTheMiddleOfEnteringANumber = _userIsInTheMiddleOfEnteringANumber;
 @synthesize numberHasDecimalPoint = _numberHasDecimalPoint;
 @synthesize brain = _brain;
+@synthesize testVariableValues = _testVariableValues;
+
 //@synthesize historyToClear = _historyToClear;
 //@synthesize clearHistory = _clearHistory;
 
@@ -48,10 +53,8 @@
     
     NSString *digit = [sender currentTitle];
     
-    if (self.userIsInTheMiddleOfEnteringANumber) 
-    {
-        if ([digit isEqualToString:@"."]) 
-        {
+    if (self.userIsInTheMiddleOfEnteringANumber) {
+        if ([digit isEqualToString:@"."]) {
             if (self.numberHasDecimalPoint) 
                 return; //can only have one decimal point per number
             else 
@@ -59,13 +62,12 @@
         }
         self.display.text = [self.display.text stringByAppendingString:digit];
     } else {
-        if ([digit isEqualToString:@"."]) 
-        {
+        if ([digit isEqualToString:@"."]) {
             self.display.text = @"0.";
             self.numberHasDecimalPoint = YES;
-        } else {
+        } else 
             self.display.text = digit;
-        }
+        
         self.userIsInTheMiddleOfEnteringANumber = YES;
     }
     
@@ -102,9 +104,10 @@
     
     double result = [self.brain performOperation:sender.currentTitle];
     NSString *resultString = [NSString stringWithFormat:@"%g", result];
-    self.display.text = resultString;
+    //self.display.text = resultString;
     
     self.historyDisplay.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+    [self synchronizeView];
     //self.historyToClear = [self.historyDisplay.text length];
     //[self addToHistory:resultString];
     //self.clearHistory = YES;
@@ -121,11 +124,13 @@
     // clear button pressed, clear display and historyDisplay
 
     self.display.text = @"0";
+    self.historyDisplay.text = @"";
     //self.historyToClear = [self.historyDisplay.text length];
     //self.clearHistory = YES;
     //[self clearHistoryDisplay];
     //[self enterPressed];
-    self.userIsInTheMiddleOfEnteringANumber = NO;
+    //self.userIsInTheMiddleOfEnteringANumber = NO;
+    //[self synchronizeView];
 
 }
 
@@ -139,11 +144,9 @@
 {
     NSLog(@"clearErrorPressed");
     
-    if (self.userIsInTheMiddleOfEnteringANumber)
-    {
+    if (self.userIsInTheMiddleOfEnteringANumber) {
         NSInteger currentDisplayLength = self.display.text.length;
-        if (currentDisplayLength == 1)
-        {
+        if (currentDisplayLength == 1) {
             self.userIsInTheMiddleOfEnteringANumber = NO;
         } else {
             NSString *lastDigit = [self.display.text substringFromIndex:currentDisplayLength - 1];
@@ -163,7 +166,46 @@
     [self.brain pushVariable:sender.currentTitle];
 }
 
+//
+// synchronizeView method
+// one place to manage all view related activities
+//
+-(void)synchronizeView {    
+    // Find the result by running the program passing in the test variable values
+    id result = [CalculatorBrain runProgram:self.brain.program 
+                        usingVariableValues:self.testVariableValues];   
+    
+    // If the result is a string, then display it, otherwise get the Number's description
+    if ([result isKindOfClass:[NSString class]])    
+        self.display.text = result;
+    else 
+        self.display.text = [NSString stringWithFormat:@"%g", [result doubleValue]];
+    
+    // Now the calculation label, from the latest description of program    
+    self.historyDisplay.text = [CalculatorBrain descriptionOfProgram:self.brain.program];
+    
+    // And finally the variables text, with a bit of formatting
+    self.variablesDisplay.text = [[[[[[[self programVariableValues] description]
+                               stringByReplacingOccurrencesOfString:@"{" withString:@""]
+                              stringByReplacingOccurrencesOfString:@"}" withString:@""]
+                             stringByReplacingOccurrencesOfString:@";" withString:@""]
+                            stringByReplacingOccurrencesOfString:@"\"" withString:@""]
+                           stringByReplacingOccurrencesOfString:@"<null>" withString:@"0"];
+    
+    // And the user isn't in the middle of entering a number
+    self.userIsInTheMiddleOfEnteringANumber = NO;
+}
 
+- (NSDictionary *)programVariableValues {   
+    
+    // Find the variables in the current program in the brain as an array
+    NSArray *variableArray = 
+    [[CalculatorBrain variablesUsedInProgram:self.brain.program] allObjects];
+    
+    // Return a description of a dictionary which contains keys and values for the keys 
+    // that are in the variable array
+    return [self.testVariableValues dictionaryWithValuesForKeys:variableArray];
+}
 
 
 //
@@ -195,98 +237,31 @@
 //}
 
 #pragma mark - Test methods
-
-//
-// test1Pressed method
-// Construct a test program, populate it with values and operations, and run it
-//
 - (IBAction)test1Pressed 
 {
-    // create a test instance of the brain
-    CalculatorBrain *test1Brain = [self brain];
-    
-    // Setup the brain
-    [test1Brain pushVariable:@"a"];
-    [test1Brain pushVariable:@"a"];
-    [test1Brain pushOperation:@"*"];
-    [test1Brain pushVariable:@"b"];
-    [test1Brain pushVariable:@"b"];
-    [test1Brain pushOperation:@"*"];
-    [test1Brain pushOperation:@"+"];
-    [test1Brain pushOperation:@"Sqrt"];  
-    
-    // Retrieve the program
-    NSArray *program = test1Brain.program;
-    
-    // Setup the dictionary
-    NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys: 
-                                [NSNumber numberWithDouble:3], @"a",
-                                [NSNumber numberWithDouble:4], @"b", nil];
-    
-    // Run the program with variables
-    NSLog(@"Running the program with variables returns the value %g",
-          [CalculatorBrain runProgram:program usingVariableValues:dictionary]);
-    
-    // List the variables in program    
-    NSLog(@"Variables in program are %@", 
-          [[CalculatorBrain variablesUsedInProgram:program] description]);
+    self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSNumber numberWithDouble:-4], @"x",
+                               [NSNumber numberWithDouble:3], @"a",
+                               [NSNumber numberWithDouble:4], @"b", nil];
+    [self synchronizeView];
 }
 
-//
-// test2Pressed
-// Construct several test programs and use them to test the descriptionOfProgram API
-//
 - (IBAction)test2Pressed 
 {
-    CalculatorBrain *test2Brain = [self brain];
-    
-    // Test a
-    [test2Brain pushOperand:3];
-    [test2Brain pushOperand:5];
-    [test2Brain pushOperand:6];
-    [test2Brain pushOperand:7];
-    [test2Brain pushOperation:@"+"];
-    [test2Brain pushOperation:@"*"];
-    [test2Brain pushOperation:@"-"];
-    
-    // Test b
-    [test2Brain pushOperand:3];
-    [test2Brain pushOperand:5];
-    [test2Brain pushOperation:@"+"];
-    [test2Brain pushOperation:@"sqrt"];
-    
-    // Test c
-    //[testBrain empty];
-    [test2Brain pushOperand:3];
-    [test2Brain pushOperation:@"sqrt"];
-    [test2Brain pushOperation:@"sqrt"];
-    
-    // Test d
-    [test2Brain pushOperand:3];
-    [test2Brain pushOperand:5];
-    [test2Brain pushOperation:@"sqrt"];
-    [test2Brain pushOperation:@"+"];
-    
-    // Test e
-    [test2Brain pushOperation:@"?"];
-    [test2Brain pushVariable:@"r"];
-    [test2Brain pushVariable:@"r"];
-    [test2Brain pushOperation:@"*"];
-    [test2Brain pushOperation:@"*"];
-    
-    // Test f
-    [test2Brain pushVariable:@"a"];
-    [test2Brain pushVariable:@"a"];
-    [test2Brain pushOperation:@"*"];
-    [test2Brain pushVariable:@"b"];
-    [test2Brain pushVariable:@"b"];
-    [test2Brain pushOperation:@"*"];
-    [test2Brain pushOperation:@"+"];
-    [test2Brain pushOperation:@"sqrt"];
-    
-    //Print the description
-    NSLog(@"Program is :%@",[CalculatorBrain descriptionOfProgram:[test2Brain program]]);
+    self.testVariableValues = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSNumber numberWithDouble:-5], @"x", nil];
+    [self synchronizeView];
+}
+
+- (IBAction)test3Pressed 
+{
+    self.testVariableValues = nil;  
+    [self synchronizeView];
 }
 
 
+- (void)viewDidUnload {
+    [self setVariablesDisplay:nil];
+    [super viewDidUnload];
+}
 @end
